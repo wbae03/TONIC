@@ -1,5 +1,5 @@
-# PID-VODCA
-PID temperature controller designed for the VODCA cryo-microscope
+# Temperature Output N' Integrative Cooling (TONIC)
+This is a PID temperature controller designed for the VODCA cryo-microscope
 
 ## Installation
 Provided you have a code editor such as Visual Studio Code on Win 8/10:

@@ -1,0 +1,24 @@
+Power Supply Port [ex. COM5]=COM5
+
+Maximum Voltage [FLOAT]=25
+
+Target Ramp Boundary [FLOAT]=0
+
+Use PID Diagnostics [True/False]=True
+
+Control Frequency (PID Control per Second) [INT]=3
+
+Kp or Proportional Coefficient [FLOAT]=0.5
+
+Ki or Integral Coefficient [FLOAT]=0.1
+
+Kd or Derivative Coefficient [FLOAT]=0.3
+
+
+best parameters for -2C/min: 
+
+Kp or Proportional Coefficient [FLOAT]=0.5
+
+Ki or Integral Coefficient [FLOAT]=0.1
+
+Kd or Derivative Coefficient [FLOAT]=0.3
