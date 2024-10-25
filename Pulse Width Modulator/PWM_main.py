@@ -1,9 +1,12 @@
 # PID_Temperature_Control_Main
 
-#from multiprocessing import Process # allows for multiple functions to be run at once/same time
-#import numpy as np
-#import matplotlib.pyplot as plt
-#from scipy.integrate import odeint
+# READ ME
+# this script has not been updated or checked for successful execution.
+# swap this script with PID_main.py in the main directory if you want to use a PWM controller instead of PID.
+# run this script as you would for PID_main.py.
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 #import nidaqmx
