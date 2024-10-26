@@ -1,31 +1,12 @@
 # Ni DAQ mx
 
+# Import packages
 import nidaqmx
 
-
-#start: bool = False
-#period: float = 0.1 # every 100 ms ??
-#logTimeInMinutes: int = 1
-#
-'''
-def measure_temperature(taskDev, devName):
-        
-        samples_per_channel = 1 # was 10
-
-        data = ThermoTaskDev.read(samples_per_channel)
-        #print(f"{data}")
-
-        #SampleAvg = sum(data)/len(data)
-
-        data = (sum(data) - 32) / (9/5) # convert F to C
-        #print(f"{SampleAvg}")
-
-        return data
-
-'''
 def main():
 
-    devName = 'Dev2' # name of the device; check NI MAX program
+    # Name of the temperature probe port. Check NIMAX for NI instruments.
+    devName = 'Dev2'
 
     with nidaqmx.Task() as ThermoTaskDev:
         ThermoChannel = ThermoTaskDev.ai_channels.add_ai_thrmcpl_chan("Dev2/ai0",
@@ -35,20 +16,20 @@ def main():
                                              thermocouple_type=nidaqmx.constants.ThermocoupleType.K,
                                              cjc_source=nidaqmx.constants.CJCSource.BUILT_IN)
 
-        #data = measure_temperature(ThermoTaskDev, devName)
-
-        samples_per_channel = 1 # was 10
+        # The amount of channels to take temperature measurements from. Default is 1. Higher channels provides more precision, but slows computing process which can cause script to fail.
+        samples_per_channel = 1
 
         data = ThermoTaskDev.read(samples_per_channel)
-        #print(f"{data}")
 
-        #SampleAvg = sum(data)/len(data)
+        # Convert from Farenheit to Celsius
+        data = (sum(data) - 32) / (9/5)
 
-        data = (sum(data) - 32) / (9/5) # convert F to C
+        # For diagnostics
         #print(f"Temperature is currently at {data} C")
 
         return data
 
+# For diagnostics
 '''
 loop = ''
 

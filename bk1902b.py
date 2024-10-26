@@ -3,9 +3,9 @@ Implements functions to control a BK1902B programmable power supply
 Open port, set voltage, set current, output on/off, etc.
 """
 
+# Import packages
 import time
 from typing import Tuple, Union
-
 import serial
 
 
