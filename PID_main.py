@@ -5,18 +5,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import time
+from colorama import init
 import math
 import os
 import pandas as pd
 import threading
 import csv
+from datetime import datetime, timedelta
 import time
-from colorama import init
 
 # Import scripts
+from bk1902b import BK1902B
 import Ni_DAQ_mx as daq
 import PID_calculator as pid
-from bk1902b import BK1902B
 
 # Defining ANSI escape colours
 RED = "\33[91m"
@@ -54,8 +55,8 @@ control_per_second = 3
 # in volts
 maximum_voltage = 20
 
-# Check device manager to find correct COM#. 
-power_supply_port = 'COM5'
+# Check device manager to find correct COM#
+power_supply_port = 'COM4'
 
 # Default PID values
 P = 2.65
@@ -65,6 +66,7 @@ D = 0
 #====================== Import settings from _TONIC_Properties.txt =============================================
 
 try:
+
     os.mkdir(save_path + '/TONIC/')
 
     print(f"\n{RED}[PROGRAM] > {END}Directory '% s' created!" % settings_directory)
@@ -74,21 +76,28 @@ except FileExistsError:
     print(f"\n{RED}[PROGRAM] > {END}Directory '% s' already exists!" % settings_directory)
 
     try:
+
         with open(os.path.join(save_path, settings_directory, '_TONIC_Properties.txt'), 'r') as f:
+
             reader = csv.reader(f, delimiter='=')
 
             rows = list(reader)
-            #for i, row in enumerate(rows):
-            #    print(f"Row {i}: {row}")
 
             # Ensure there are enough rows before accessing
             power_supply_port = rows[0][1].strip()
+
             maximum_voltage = float(rows[2][1].strip())
+
             boundary = float(rows[4][1].strip())
+
             use_PID_diagnostics = bool(rows[6][1].strip())
+
             control_per_second = int(rows[8][1].strip())
+
             P = float(rows[10][1].strip())
+
             I = float(rows[12][1].strip())
+
             D = float(rows[14][1].strip())
 
     except FileNotFoundError: 
@@ -97,21 +106,19 @@ except FileExistsError:
 
 #==========================================================================================================
 
-
-# Establish connection with power supply USB port.
+# Establish connection with power supply USB port
 try:
 
     with BK1902B(power_supply_port) as psu:
 
         psu.disable_output()
-        
+
 except:
 
     print(f'\n{RED} ERROR! The port {power_supply_port} is unavailable or undetectable on the computer.{END}')
 
     exit()
 
-# Provide a file name for the cooling experiment.
 print(f'\n{RED}[PROGRAM] > {END}Please enter a new file name for the cooling experiment that you are going to do.')
 
 custom_name = input(f'\n{GREEN}[USER INPUT] > {END}{YELLOW}Create New Filename:{END} ')
@@ -150,7 +157,7 @@ target_line, = ax.plot([], [], lw=2, color='#006078', label='Target Temperature'
 
 actual_line, = ax.plot([], [], lw=2, color='#82BAC4', label='Actual Temperature')
 
-# Initialize the PID plots
+# Initialize PID plots
 if use_PID_diagnostics == True:
 
     P_line, = ax.plot([], [], lw=2, color='green', label='Proportional')
@@ -213,9 +220,9 @@ pid.set_PID(P, I, D)
 
 #==========================================================================================================
 
-
 # make save folder
 try: 
+
     os.mkdir(save_path + '/TONIC/' + f'{timestr}_{custom_name}')
 
     print(f"\n{RED}[PROGRAM] > {END}Directory '% s' created!" % custom_name)
@@ -226,14 +233,13 @@ except FileExistsError:
 
 save_directory = os.path.join(save_path, 'TONIC', f'{timestr}_{custom_name}')
 
-
 #==================== User Input for Temperature Ramp =============================================================
 
 current_temperature = daq.main()
 
 print(f'\n{RED}[PROGRAM] > {END}The current temperature reading from the temperature probe is:', current_temperature, ' C.')
 
-print(f'\n{RED}[PROGRAM] > {END}Please input the Temperature / Time fraction to register the temperature ramp {RED}(+/- temperature signs matter){END}: \n{YELLOW}(1) Temperature (C){END}\n{YELLOW}(2) Seconds{END}')
+print(f'\n{RED}[PROGRAM] > {END}Please input the below values to get the desired temperature ramp {RED}(+/- signs matter!!){END}: \n{YELLOW}(1) Temperature (C){END}\n{YELLOW}(2) Seconds{END}')
 
 input_valid = False
 
@@ -246,6 +252,7 @@ while input_valid == False:
         if isinstance(float(temperature_input), float):
 
             input_valid = True
+
             temperature_input = float(temperature_input)
     
     except:
@@ -273,7 +280,6 @@ while input_valid == False:
 
 ramp = round(temperature_input/second_input, 3)
 
-# Reset this for the next loop
 input_valid = False
 
 while input_valid == False:
@@ -315,30 +321,30 @@ while input_valid == False:
 ramp_duration = (final_temperature - init_temperature) / ramp
 
 # round to nearest second. Must be in whole seconds; the program will only change temperatures every whole-integer second.
-ramp_duration = math.ceil(ramp_duration)
+ramp_duration = math.ceil(ramp_duration) 
 
 # If the time is negative that the temperature ramp is not logical. Force shut down program.
-if ramp_duration < 0:
+if ramp_duration < 0: 
 
     close = input(f'\n{RED}The inputted values are not logical. The ramp does not agree with the specific initial and final temperatures. Please restart the program by pressing any key.{END}')
-   
+    
     exit()
 
 input_valid = False
 
 while input_valid == False:
 
-    #  Confirm the provided values
+    # Confirm the provided values
     print(f'\n{RED}[PROGRAM] > {END}\nThe given temperature ramp is:{YELLOW}', ramp, f'C/second{END}.\nThe given start temperature is:{YELLOW}', init_temperature,f'C{END}.\nThe given final temperature is:{YELLOW}', final_temperature,f'C{END}.\nThe calculated duration of the temperature ramp process will be:{YELLOW}', ramp_duration,f'seconds{END}.\nPlease confirm the desired temperature ramp {RED}(+/- signs matter!!){END}.\nPress {YELLOW}[ENTER]{END} to start an initial cooldown/warmup to the starting temperature, followed by the temperature ramp process.')
-   
+    
     start_program = input(f'\n{GREEN}[USER INPUT] > {END}')
 
     if start_program == '': 
-   
+        
         input_valid = True
 
     else:
-    
+
         print(f'\n{RED}[PROGRAM] > {END}Invalid input. Please give a numerical value.')
 
 # List containing the target temperatures
@@ -352,7 +358,7 @@ for t in target_temperatures:
     # subtract from target_temperatures[0] to get 0 seconds at the initial temperature
     target_time.append((t - target_temperatures[0]) / ramp) 
 
-# Start temperature control
+#============================= START TEMPERATURE CONTROL ==========================================
 with BK1902B(power_supply_port) as psu:
 
     print(f'\n{YELLOW}[TEMPERATURE RAMP - INITIALIZING] > {END}Resetting power supply output to obtain initial temperature (',init_temperature,' C). Please wait until the actual temperature has reached the target initial temperature before starting.')
@@ -365,7 +371,7 @@ with BK1902B(power_supply_port) as psu:
     psu.set_voltage(0)
     
     time.sleep(2)
-
+    
     psu.enable_output()
 
     def bk1902b(set_voltage, power_supply_port):
@@ -377,7 +383,7 @@ with BK1902B(power_supply_port) as psu:
         return output
 
     target_temperatures_rtp = []
-    
+
     for i in range(len(target_time)):
 
         target_temperatures_rtp.append(init_temperature)
@@ -388,9 +394,9 @@ with BK1902B(power_supply_port) as psu:
     def get_input():
 
         global begin_ramp
-        
+
         # dummy input variable to halt code until input is given
-        keystrk = input(f"\n{RED}[PROGRAM] > {END}Please press {YELLOW}[ENTER]{END} when you are ready to begin the temperature ramp and have started recording.")
+        keystrk=input(f"\n{RED}[PROGRAM] > {END}Please press {YELLOW}[ENTER]{END} when you are ready to begin the temperature ramp and have started recording.")
         
         begin_ramp = True
         
@@ -411,6 +417,8 @@ with BK1902B(power_supply_port) as psu:
     plt.show()
 
     initialization_time = time.time()
+
+    datetime_initialization_time = datetime.now()
 
     reset_integral_loop = True
 
@@ -441,34 +449,33 @@ with BK1902B(power_supply_port) as psu:
 
             psu.enable_output()
 
-            set_voltage, Px, Ix, Dx = pid.PID(init_temperature, current_temperature) 
+            set_voltage, Px, Ix, Dx = pid.PID(init_temperature, current_temperature) # MV = manipulated variable; ie the variable we control to influence temperature... output voltage!
 
             if set_voltage > maximum_voltage:
 
                 # Ensures set voltage does not go over the maximum allowed
-                set_voltage = maximum_voltage 
+                set_voltage = maximum_voltage
 
             voltage_output = bk1902b(set_voltage, power_supply_port)
 
         time.sleep(0.3)
 
         initialization_end_time = time.time()
-        
-        # Appends to time axes for plotting
-        time_axes.append(initialization_end_time - initialization_time) 
+
+        # Append to time axes for plotting
+        time_axes.append(initialization_end_time - initialization_time)
 
         plt.draw()
 
         plt.pause(0.01)
 
+#==================== Start Temperature Ramp Program ===============================================================
 
-    #==================== Start Temperature Ramp Program ===============================================================
-
-    # temperatures for real-time plot
+    # Temperatures for real time plot
     target_temperatures_rtp = target_temperatures
 
     # keep track of time during ramp program
-    start_time = time.time() 
+    start_time = time.time()
 
     # reset the axes
     time_axes = []
@@ -507,8 +514,9 @@ with BK1902B(power_supply_port) as psu:
 
                 D_axes.append(Dx)
 
-            set_voltage, Px, Ix, Dx = pid.PID(t, current_temperature)
+            set_voltage, Px, Ix, Dx = pid.PID(t, current_temperature) 
 
+            # Set voltage does not exceed maximum defined voltage
             if set_voltage > maximum_voltage:
                 
                 set_voltage = maximum_voltage
@@ -519,9 +527,10 @@ with BK1902B(power_supply_port) as psu:
 
             tf = time.time()
 
-            # the processes above takes ~ 0.8 ms to execute... so the 1-x below will be about ~ 0.2ms to compensate to 1 second
+            # The processes above takes ~ 0.8 ms to execute... so the 1-x below will be about ~ 0.2ms to compensate to 1 second
             x = tf - t0 
 
+            # Time spent running code is saved as seconds
             time_axes.append(tf - start_time)
 
             # For diagnostic purposes
@@ -532,8 +541,8 @@ with BK1902B(power_supply_port) as psu:
                 # For diagnostic purposes
                 #print(1/control_per_second - x)
 
-                # Update the plot
                 plt.draw()
+
                 plt.pause(0.01)
 
                 tf = time.time()
@@ -542,7 +551,7 @@ with BK1902B(power_supply_port) as psu:
                 loop_duration = tf - t0
 
                 # Sleep for the remaining time
-                time.sleep(max(0, 1/control_per_second - loop_duration)) 
+                time.sleep(max(0, 1/control_per_second - loop_duration))
 
             except:
 
@@ -562,6 +571,7 @@ with BK1902B(power_supply_port) as psu:
 
     #================================================================================================================================
 
+
     print(f'\n{PURPLE}[TEMPERATURE RAMP - TERMINATING] > {END}Ramp program has reached the final temperature (', final_temperature,' C).\nResetting power supply output to 0 V.')
 
     # Reset temperature back to whatever 0V gets you.
@@ -577,12 +587,21 @@ with BK1902B(power_supply_port) as psu:
     plt.show()
 
     # Closes most recent plot
-    plt.close() 
+    plt.close()
         
 #======================== SAVING DATA ===============================================================================================
 
+    saved_time_data = []
+
+    # Convert the seconds of the cooling ramp into system datetime
+    for t in time_axes:
+        
+        new_time_format = datetime_initialization_time + timedelta(seconds=t)
+
+        saved_time_data.append(new_time_format.strftime("%Y%m%d_%H%M%S"))
+
     # Save raw data as csv
-    d = {'Time (s)': time_axes, 'Temperature (C)': temperature_axes, 'Target Ramp (C/s)': ramp, 'Starting T': init_temperature, 'Final Target T': final_temperature}
+    d = {'Time (YMD_HMS)': saved_time_data, 'Time (seconds)': time_axes,'Temperature (C)': temperature_axes, 'Target Ramp (C/s)': ramp, 'Starting T': init_temperature, 'Final Target T': final_temperature}
 
     export_temperature_data = pd.DataFrame(d)
 

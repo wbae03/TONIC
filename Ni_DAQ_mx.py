@@ -25,10 +25,10 @@ def measure_temperature(taskDev, devName):
 '''
 def main():
 
-    devName = 'Dev1' # name of the device; check NI MAX program
+    devName = 'Dev2' # name of the device; check NI MAX program
 
     with nidaqmx.Task() as ThermoTaskDev:
-        ThermoChannel = ThermoTaskDev.ai_channels.add_ai_thrmcpl_chan("Dev1/ai0",
+        ThermoChannel = ThermoTaskDev.ai_channels.add_ai_thrmcpl_chan("Dev2/ai0",
                                              name_to_assign_to_channel="Thermocouple",
                                              min_val=-60.0,
                                              max_val=100.0, units=nidaqmx.constants.TemperatureUnits.DEG_F,
