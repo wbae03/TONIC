@@ -12,6 +12,7 @@ example of installation with pip:
 
 pip install [] 
 $ python -m pip install []
+or other derivatives...
 
 Required Packages:
 
