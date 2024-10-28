@@ -36,5 +36,13 @@ After installing the packages, ensure the scripts can communicate with the power
 
     ![Screenshot 2024-10-25 165051](https://github.com/user-attachments/assets/3066a2d0-4dc1-4e8d-8d8d-14fcae66aa6a)
 
+# Running
 Running the PID_main.py script should prompt with instructions on program usage, if everything has been set up correctly.
+- Instructions include the input of a temperature ramp, starting temperature and ending temperature.
 
+While the scripts run, a live temperature-time plot will be shown.
+The program will attempt to reach equilibrium with the initial temperature. When the user feels confident that the starting temperature is stable/achieved, they may tell the script to begin the ramp.
+This start the temperature ramp and temperature-time data collection.
+
+# Data Save
+In the current version, TONIC **MUST** run to completion (ie. reach the final temperature) for the data to be saved as an Excel spreadsheet. I had trouble implementing a function to listen for a 'cancel-experiment' event. I believe parallel processing may be the way to achieve this, but I am not sure.
