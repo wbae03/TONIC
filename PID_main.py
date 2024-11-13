@@ -12,7 +12,7 @@ import pandas as pd
 import threading
 import csv
 from datetime import datetime, timedelta
-import time
+import msvcrt
 
 # Import scripts
 from bk1902b import BK1902B
@@ -60,7 +60,9 @@ power_supply_port = 'COM4'
 
 # Default PID values
 P = 2.65
+
 I = 0.00000000025
+
 D = 0
 
 #====================== Import settings from _TONIC_Properties.txt =============================================
@@ -535,6 +537,12 @@ with BK1902B(power_supply_port) as psu:
 
             # For diagnostic purposes
             #print('Time of 1 cycle:', x)
+
+            ### NEW IMPLEMENTATOIN: EXIT LOOP ON 'ENTER' INPUT ##
+            if msvcrt.kbhit():
+                if msvcrt.getwche() == '\r':
+                    break
+            ##############################
 
             try:
 
