@@ -23,6 +23,7 @@ pip install pandas
 pip install bk_precision_1900
 pip install nidaqmx
 pip install scipy
+pip install pyserial
 ```
 After installing the packages, ensure the scripts can communicate with the power supply and the thermocouple. Plug-in the instruments into the computer before finding their respective ports. To view the port names, the appropriate software drivers must be installed for the BK Precision Model 1902B DC Power Supply and the NI USB-TC01 Temperature Input Device. Details may be found in the document link above.
 
