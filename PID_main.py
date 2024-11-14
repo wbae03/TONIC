@@ -65,6 +65,9 @@ I = 0.00000000025
 
 D = 0
 
+# Visualize the PID values on the graph for diagnostics or PID optimization
+use_PID_diagnostics = False
+
 #====================== Import settings from _TONIC_Properties.txt =============================================
 
 try:
@@ -126,9 +129,6 @@ print(f'\n{RED}[PROGRAM] > {END}Please enter a new file name for the cooling exp
 custom_name = input(f'\n{GREEN}[USER INPUT] > {END}{YELLOW}Create New Filename:{END} ')
 
 #====================== Real-time Temperature Graph Initialization =============================================
-
-# Visualize the PID values on the graph for diagnostics or PID optimization
-use_PID_diagnostics = True
 
 # Initialize plot data
 time_axes = []
@@ -402,7 +402,7 @@ with BK1902B(power_supply_port) as psu:
         
         begin_ramp = True
         
-        print(f'\n{GREEN}[TEMPERATURE RAMP - INITIALIZING] > {END}Beginning Temperature Ramp...')
+        print(f'\n{GREEN}[TEMPERATURE RAMP - INITIALIZING] > {END}Beginning Temperature Ramp. Press {GREEN}ENTER{END} to terminate ramp.')
 
         timestr = time.strftime("%Y%m%d_%H%M%S")
 
@@ -538,12 +538,6 @@ with BK1902B(power_supply_port) as psu:
             # For diagnostic purposes
             #print('Time of 1 cycle:', x)
 
-            ### NEW IMPLEMENTATOIN: EXIT LOOP ON 'ENTER' INPUT ##
-            if msvcrt.kbhit():
-                if msvcrt.getwche() == '\r':
-                    break
-            ##############################
-
             try:
 
                 # For diagnostic purposes
@@ -570,6 +564,14 @@ with BK1902B(power_supply_port) as psu:
                 close = input(f'\nThe power supply will reset to 0 V. Press any key to terminate the program.')
                 
                 close()
+        
+        ### EXIT LOOP ON 'ENTER' INPUT ##
+
+        if msvcrt.kbhit():
+            if msvcrt.getwche() == '\r':
+                print(f'\n{RED}[PROGRAM] >{END} Ramp terminated by user.\n')
+                break
+        ##############################
 
     end_time = time.time()
 
@@ -584,18 +586,6 @@ with BK1902B(power_supply_port) as psu:
 
     # Reset temperature back to whatever 0V gets you.
     psu.disable_output()
-
-    Kp, Ki, Kd = pid.return_PID_values()
-
-    # Close the plot after the loop is done
-    plt.ioff()
-
-    plt.savefig(os.path.join(save_directory, f'{timestr}_{custom_name}_P({Kp})_I({Ki})_D({Kd}).png'))
-    
-    plt.show()
-
-    # Closes most recent plot
-    plt.close()
         
 #======================== SAVING DATA ===============================================================================================
 
@@ -615,4 +605,17 @@ with BK1902B(power_supply_port) as psu:
 
     export_temperature_data.to_csv(os.path.join(save_directory, f'{timestr}_{custom_name}.csv') )
                                    
-print(f'\n{PURPLE}[PROGRAM] > {END}The program has concluded!')
+    print(f'\n{PURPLE}[PROGRAM] > {END}The program has concluded!')
+
+#========= SAVING GRAPH ======================================
+    Kp, Ki, Kd = pid.return_PID_values()
+
+    # Close the plot after the loop is done
+    plt.ioff()
+
+    plt.savefig(os.path.join(save_directory, f'{timestr}_{custom_name}_P({Kp})_I({Ki})_D({Kd}).png'))
+    
+    plt.show()
+
+    # Closes most recent plot
+    plt.close()
