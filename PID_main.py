@@ -420,7 +420,7 @@ with BK1902B(power_supply_port) as psu:
 
     initialization_time = time.time()
 
-    datetime_initialization_time = datetime.now()
+    #datetime_initialization_time = datetime.now()    
 
     reset_integral_loop = True
 
@@ -472,6 +472,9 @@ with BK1902B(power_supply_port) as psu:
         plt.pause(0.01)
 
 #==================== Start Temperature Ramp Program ===============================================================
+
+    # Store the initiatization time so system date-time can be saved in excel afterwards.
+    datetime_initialization_time = datetime.now()    
 
     # Temperatures for real time plot
     target_temperatures_rtp = target_temperatures
