@@ -418,8 +418,11 @@ with BK1902B(power_supply_port) as psu:
 
     initialization_time = time.time()
 
+<<<<<<< Updated upstream
     datetime_initialization_time = datetime.now()
 
+=======
+>>>>>>> Stashed changes
     reset_integral_loop = True
 
     # Plot the temperature plot while waiting
